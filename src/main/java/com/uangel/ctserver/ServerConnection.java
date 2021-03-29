@@ -3,15 +3,13 @@ package com.uangel.ctserver;
 import com.uangel.ctmessage.CtxMessage;
 import io.netty.channel.Channel;
 
-public class Request {
+public class ServerConnection {
     Server server;
     Channel channel;
-    CtxMessage message;
 
-    public Request(Server server, Channel channel, CtxMessage message) {
+    public ServerConnection(Server server, Channel channel) {
         this.server = server;
         this.channel = channel;
-        this.message = message;
     }
 
     public Server getServer() {
@@ -22,7 +20,9 @@ public class Request {
         return channel;
     }
 
-    public CtxMessage getMessage() {
-        return message;
+    public void sendResponse(CtxMessage request, String msg) {
+        // channel의 write 를 호출 하면
+        // pipeline의 마지막 handler의 write 가 호출 됨
+        channel.writeAndFlush(new CtxMessage(request.getTrid(), msg));
     }
 }

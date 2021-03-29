@@ -29,8 +29,8 @@ public class TestCtClient {
             cf = application.getBean(ClientFactory.class);
             var si = new ServerFactory();
             try {
-                var server = si.newServer(8080, request -> {
-                    request.getServer().sendResponse(request, "hello " + request.getMessage().getMsg());
+                var server = si.newServer(8080, (con, request) -> {
+                    con.sendResponse(request, "hello " + request.getMsg());
                 });
 
                 var client = server.thenCompose(s -> {
@@ -105,7 +105,7 @@ public class TestCtClient {
 
             var si = new ServerFactory();
             try {
-                var server = si.newServer(8080, request -> {
+                var server = si.newServer(8080, (con,request) -> {
                     //request.getServer().sendResponse(request, "hello " + request.getMessage().getMsg());
                 });
 
@@ -136,7 +136,7 @@ public class TestCtClient {
     @Test
     public void testNoServer() throws Throwable {
 
-        try( var application = new AnnotationConfigApplicationContext(ShareClientModule.class, ServerModule.class)) {
+        try( var application = new AnnotationConfigApplicationContext(ShareClientModule.class)) {
 
             cf = application.getBean(ClientFactory.class);
 
@@ -147,8 +147,8 @@ public class TestCtClient {
 
             var si = new ServerFactory();
             try {
-                var server = si.newServer(8080, request -> {
-                    request.getServer().sendResponse(request, "hello " + request.getMessage().getMsg());
+                var server = si.newServer(8080, (con,request) -> {
+                    con.sendResponse(request, "hello " + request.getMsg());
                 });
 
                 Thread.sleep(3000);

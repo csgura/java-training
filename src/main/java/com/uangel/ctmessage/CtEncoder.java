@@ -10,9 +10,11 @@ public class CtEncoder extends MessageToByteEncoder<CtxMessage> {
 
         var b = msg.getMsg().getBytes();
 
+        // header write
         out.writeLong(msg.getTrid());
         out.writeLong(b.length);
 
+        // body write
         out.writeBytes(b);
     }
 }

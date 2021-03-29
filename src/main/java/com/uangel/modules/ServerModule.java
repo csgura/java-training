@@ -18,8 +18,8 @@ public class ServerModule {
     @Bean
     @Qualifier("server-8080")
     CompletableFuture<Server> server8080(ServerFactory pool) {
-        return pool.newServer(8080, request -> {
-            request.getServer().sendResponse(request, "hello " + request.getMessage().getMsg());
+        return pool.newServer(8080, (con,request) -> {
+            con.sendResponse(request, "hello " + request.getMsg());
         });
     }
 
