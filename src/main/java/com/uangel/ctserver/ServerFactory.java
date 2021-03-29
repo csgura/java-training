@@ -14,7 +14,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public class ServerInit implements AutoCloseable {
+public class ServerFactory implements AutoCloseable {
 
     EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -64,7 +64,7 @@ public class ServerInit implements AutoCloseable {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        var si = new ServerInit();
+        var si = new ServerFactory();
         var server = si.newServer(8080, request -> {
             System.out.println("on request");
 

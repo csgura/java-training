@@ -1,7 +1,7 @@
 package com.uangel.modules;
 
 import com.uangel.ctserver.Server;
-import com.uangel.ctserver.ServerInit;
+import com.uangel.ctserver.ServerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,13 +11,13 @@ import java.util.concurrent.CompletableFuture;
 @Configuration
 public class ServerModule {
     @Bean
-    public ServerInit serverThreadPool() {
-        return new ServerInit();
+    public ServerFactory serverThreadPool() {
+        return new ServerFactory();
     }
 
     @Bean
     @Qualifier("server-8080")
-    CompletableFuture<Server> server8080(ServerInit pool) {
+    CompletableFuture<Server> server8080(ServerFactory pool) {
         return pool.newServer(8080, request -> {
             request.getServer().sendResponse(request, "hello " + request.getMessage().getMsg());
         });

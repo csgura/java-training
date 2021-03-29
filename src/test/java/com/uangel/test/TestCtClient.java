@@ -1,17 +1,12 @@
 package com.uangel.test;
 
 import com.uangel.ctclient.ClientFactory;
-import com.uangel.ctclient.ClientImpl;
 import com.uangel.ctserver.Server;
-import com.uangel.ctserver.ServerInit;
-import com.uangel.impl.actorcli.FactoryActorInterface;
+import com.uangel.ctserver.ServerFactory;
 import com.uangel.modules.*;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -32,7 +27,7 @@ public class TestCtClient {
         var application = new AnnotationConfigApplicationContext(DefaultModule.class);
         try {
             cf = application.getBean(ClientFactory.class);
-            var si = new ServerInit();
+            var si = new ServerFactory();
             try {
                 var server = si.newServer(8080, request -> {
                     request.getServer().sendResponse(request, "hello " + request.getMessage().getMsg());
@@ -108,7 +103,7 @@ public class TestCtClient {
         try( var application = new AnnotationConfigApplicationContext(DefaultModule.class)) {
             cf = application.getBean(ClientFactory.class);
 
-            var si = new ServerInit();
+            var si = new ServerFactory();
             try {
                 var server = si.newServer(8080, request -> {
                     //request.getServer().sendResponse(request, "hello " + request.getMessage().getMsg());
@@ -150,7 +145,7 @@ public class TestCtClient {
 
             Thread.sleep(3000);
 
-            var si = new ServerInit();
+            var si = new ServerFactory();
             try {
                 var server = si.newServer(8080, request -> {
                     request.getServer().sendResponse(request, "hello " + request.getMessage().getMsg());
