@@ -5,10 +5,12 @@ import com.uangel.ctserver.ServerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.concurrent.CompletableFuture;
 
 @Configuration
+@Lazy
 public class ServerModule {
     @Bean
     public ServerFactory serverThreadPool() {
@@ -34,4 +36,5 @@ public class ServerModule {
         };
 
     }
+
 }

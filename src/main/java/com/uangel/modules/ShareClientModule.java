@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({FactoryActorInterface.class, ActorModule.class})
+@Import({FactoryActorInterface.class})
 public class ShareClientModule {
 }

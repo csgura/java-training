@@ -21,6 +21,9 @@ class messageSendRequest implements ResponseType<String> {
     }
 }
 
+
+// Client 의 구현
+// 여기서는 method -> message 로 변환하는 작업만 수행
 public class ClientActorInterface implements Client {
 
     private ActorRef ref;

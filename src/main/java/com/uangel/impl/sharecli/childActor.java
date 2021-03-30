@@ -26,6 +26,7 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
     private Cancellable cancelTimer = getContext().getSystem().getScheduler().scheduleWithFixedDelay(Duration.ofSeconds(5), Duration.ofSeconds(1), self(), new messageConnCheck(), getContext().dispatcher(),  ActorRef.noSender());
 
 
+    // 일정시간 동안 message 가 없으면 자동으로 종료되게 , 마지만 message 받은 시간을 기록
     OffsetDateTime lastMessageTime = OffsetDateTime.now();
 
 
@@ -90,6 +91,7 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
         }
 
         void onSendRequest( messageSendRequest r) {
+            // 마지막으로 message 받은 시각을 저장
             lastMessageTime = OffsetDateTime.now();
             stash();
         }
@@ -138,17 +140,10 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
 
     class activeState {
         void onSendRequest( messageSendRequest r) {
+            // 마지막으로 메시지 받은 시각을 저장
             lastMessageTime = OffsetDateTime.now();
 
             System.out.println("onSendRequest");
-//                    var returnPath = this.sender();
-//                    sendRequestTo(connections, 0 , r.msg).whenComplete((s, throwable) -> {
-//                        if (throwable != null) {
-//                            r.sendResponse(returnPath, throwable, self());
-//                        } else {
-//                            r.sendResponse(returnPath, s, self());
-//                        }
-//                    });
 
             r.sendFutureResponse(sender(), sendRequestTo(connections, 0 , r.msg) , self());
         }
@@ -187,6 +182,8 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
             var now = OffsetDateTime.now();
             var diff = Duration.between(lastMessageTime, now);
 
+            // 마지막으로 메시지 받은 시각과 지금 시간을 비교하여 10초 동안 아무런 send request 를 받지 않았으면
+            // actor stop
             if ( diff.getSeconds() >= 10 ) {
                 getContext().stop(self());
                 return;

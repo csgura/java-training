@@ -28,14 +28,10 @@ class FactoryActor extends AbstractActor  {
                 .build();
     }
 
+    // messageNewClient 를 받으면 실행됨
     private void onNewClient(messageNewClient req) {
-//        var childName = String.format("%s-%d", req.addr, req.port);
-//
-//        var childOpt = this.getContext().child(childName);
-//        var child = childOpt.getOrElse(() -> {
-//           return this.context().actorOf(childActor.props(req, workerGroup), childName);
-//        });
 
+        // new 를 받을 때마다 child 생성
         var child = this.getContext().actorOf( childActor.props(req, workerGroup));
 
         req.sendResponse(sender(), new ClientActorInterface(child), self());

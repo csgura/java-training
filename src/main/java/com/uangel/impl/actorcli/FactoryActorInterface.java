@@ -2,6 +2,7 @@ package com.uangel.impl.actorcli;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import com.typesafe.config.Config;
 import com.uangel.actor.util.ResponseType;
 import com.uangel.ctclient.Client;
 import com.uangel.ctclient.ClientFactory;
@@ -29,6 +30,8 @@ class messageNewClient implements ResponseType<Client> {
 
 @Component
 @Lazy
+// ClientFactory 의 actor 버젼 구현
+// FactoryActorInterface 는 FactoryActor 를 생성하고 , method -> message 로 변환하는 작업을 수행
 public class FactoryActorInterface implements ClientFactory , AutoCloseable {
 
     ActorRef mainActorRef;
@@ -52,4 +55,5 @@ public class FactoryActorInterface implements ClientFactory , AutoCloseable {
     public void close() throws Exception {
         actorSystem.stop(mainActorRef);
     }
+
 }

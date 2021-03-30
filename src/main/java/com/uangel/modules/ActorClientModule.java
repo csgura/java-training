@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({ActorModule.class, ActorClientModule.class})
-public class DefaultModule {
+@Import(FactoryActorInterface.class)
+public class ActorClientModule {
 }

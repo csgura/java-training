@@ -1,5 +1,8 @@
-package com.uangel.ctclient;
+package com.uangel.impl.pojocli;
 
+import com.uangel.ctclient.Client;
+import com.uangel.ctclient.ClientConnection;
+import com.uangel.ctclient.ClientStatusListener;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
@@ -11,6 +14,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+
+// Client 의 구현
+// actor 를 쓰지 않고 구현함
 public class ClientImpl implements Client, ClientStatusListener {
     EventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -27,21 +33,6 @@ public class ClientImpl implements Client, ClientStatusListener {
 
     }
 
-
-    static public CompletableFuture<ClientImpl> New(String addr , int port , int numConnection) {
-
-        var client = new ClientImpl(addr , port);
-
-        for(int i=0;i<numConnection;i++) {
-            client.connections.add(ClientConnection.newConnection( client.workerGroup,  client , addr,port));
-        }
-
-        return CompletableFuture.completedFuture(client);
-    }
-
-
-
-
     @Override
     public void close() {
 
@@ -54,6 +45,7 @@ public class ClientImpl implements Client, ClientStatusListener {
     }
 
 
+    // 주기적으로 connection 체크 해서 연결 실패한 연결을 다시 연결하는 코드
     public void checkConns() {
 
         connections = connections.stream().map(f -> {
@@ -78,6 +70,7 @@ public class ClientImpl implements Client, ClientStatusListener {
     }
 
     @Override
+    // 연결이 끊어진 경우 , 다시 연결하는 코드
     public void disconnected(ClientConnection conn) {
         connections = connections.stream().map(f -> {
             if ( f.isDone() && !f.isCompletedExceptionally() && !f.isCancelled()) {
@@ -106,16 +99,10 @@ public class ClientImpl implements Client, ClientStatusListener {
             return f;
         }).collect(Collectors.toList());
 
-
-//        lock.lock();
-//        try {
-//            connections.remove(channel);
-//        } finally {
-//            lock.unlock();
-//        }
-//        rmConnection();
     }
 
+    // request 를 idx 번째 connection 에 보내고 실패하면
+    // idx+1  번째에 재귀적으로 request 를 보내는 코드
     private CompletableFuture<String> sendRequestTo( int idx, String msg ) {
        var ret =  connections.get(idx).thenCompose(c -> c.sendRequest(msg));
        return ret.handle((s, throwable) -> {

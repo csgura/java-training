@@ -35,7 +35,9 @@ public class ClientActorInterface implements Client {
 
     @Override
     public void close() {
-        //ref.tell(new messageClose(), ActorRef.noSender());
+        // actorcli 와 비교했을 때 달라지는 점은
+        // close 가 호출되어도 아무것도 하지 않는다는 점
+        // actor 는 일정시간 동안 request 가 없으면 , 자동으로 종료된다.
     }
 
     @Override
