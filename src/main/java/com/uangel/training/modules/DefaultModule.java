@@ -8,6 +8,8 @@ import org.springframework.core.annotation.Order;
 
 @Configuration
 @Import({ActorModule.class, ActorClientModule.class})
+// ActorSystem 과  ClientFactory 를 제공합니다.
+// 필요한 모듈은 없습니다.
 public class DefaultModule {
     @Bean
     @Order(0)

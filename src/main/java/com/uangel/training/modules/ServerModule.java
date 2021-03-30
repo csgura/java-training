@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 
 @Configuration
 @Lazy
+// ServerFactory 와  8080 port 에 binding 된 서버를 제공합니다.
+// 필요한 모듈은 없습니다.
 public class ServerModule {
     @Bean
     public ServerFactory serverThreadPool() {
@@ -25,6 +27,8 @@ public class ServerModule {
         });
     }
 
+    // 위에서 binding 된 CompletableFuture<Server> 는 close 함수가 없기 때문에
+    // close 해주는 bean 을 등록합니다.
     @Bean
     public AutoCloseable serverCloser( @Qualifier("server-8080")CompletableFuture<Server> server) {
 

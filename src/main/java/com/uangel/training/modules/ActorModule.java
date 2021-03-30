@@ -12,36 +12,29 @@ import java.io.File;
 
 @Configuration
 @Lazy
+// Config 와 ActorSystem 을 제공합니다.
+// 필요한 모듈은 없습니다
 public class ActorModule {
 
 
     @Bean
     public Config config() {
-        var cfg =  ConfigFactory.parseFile(new File("/Users/gura/git/ulib/test/testActor/reference.conf"));
+//        var cfg =  ConfigFactory.parseFile(new File("/Users/gura/git/ulib/test/testActor/reference.conf"));
+//
+//        if (cfg.hasPath("xx.xx")) {
+//            cfg.getString("xx.xx");
+//        }
+//        System.out.println("cfg = " +  cfg.root().render(ConfigRenderOptions.defaults().setOriginComments(false).setJson(false)));
+//
+//        return ConfigFactory.load(cfg);
 
-        if (cfg.hasPath("xx.xx")) {
-            cfg.getString("xx.xx");
-        }
-        System.out.println("cfg = " +  cfg.root().render(ConfigRenderOptions.defaults().setOriginComments(false).setJson(false)));
-
-        return ConfigFactory.load(cfg);
+        return ConfigFactory.load();
     }
 
+    // ActorSystem 은 Close 함수가 없어서
+    // destroyMethod 로 close 할 때 호출될 메소드를 지정해야 합니다.
     @Bean(destroyMethod = "terminate")
     public ActorSystem actorSystem(  Config cfg) {
         return ActorSystem.create("mysystem", cfg);
     }
 }
-
-
-/*
-@Configuration
-class ClientFactoryModule {
-    @Bean
-    public ClientFactory clientFactory( ActorSystem actorsystem ) {
-        return new FactoryActorInterface(actorsystem);
-    }
-
-    //binder.BindConstructor(ClientFactory.class, FactoryActorInterface.class);
-}
-*/

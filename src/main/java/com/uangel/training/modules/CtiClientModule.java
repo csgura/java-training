@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 
 @Configuration
 @Lazy
+// Client 를 제공합니다.
+// ClientFactory 를 필요로 합니다. ActorClientModule , PojoClientModule, ShareClientModule 등을 사용할 수 있습니다.
 public class CtiClientModule {
 
     @Bean
