@@ -1,6 +1,6 @@
 package com.uangel.test
 
-import com.uangel.hello.Hello
+import com.uangel.training.hello.Hello
 import org.scalatest.funsuite.AnyFunSuite
 import org.springframework.context.annotation.{AnnotationConfigApplicationContext, Bean, Configuration, Lazy, Primary, Profile}
 import org.springframework.stereotype.Component
