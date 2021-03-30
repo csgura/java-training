@@ -6,6 +6,7 @@ import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
 import com.uangel.ctclient.ClientFactory;
 import com.uangel.impl.actorcli.FactoryActorInterface;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -17,7 +18,7 @@ import java.io.File;
 public class ActorModule {
 
 
-    @Bean()
+    @Bean
     public Config config() {
         var cfg =  ConfigFactory.parseFile(new File("/Users/gura/git/ulib/test/testActor/reference.conf"));
 
@@ -30,8 +31,7 @@ public class ActorModule {
     }
 
     @Bean(destroyMethod = "terminate")
-    //@Bean
-    public ActorSystem actorSystem( Config cfg) {
+    public ActorSystem actorSystem(  Config cfg) {
         return ActorSystem.create("mysystem", cfg);
     }
 }

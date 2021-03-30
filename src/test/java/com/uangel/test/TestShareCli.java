@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {ShareClientModule.class, ActorModule.class, ServerModule.class})
+@ContextConfiguration(classes = {ShareClientModule.class,  ActorModule.class, ServerModule.class})
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
 public class TestShareCli {
 
