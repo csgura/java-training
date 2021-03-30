@@ -47,8 +47,6 @@ class MockupHelloNotSameName {
     }
 }
 
-@Component
-@Lazy
 @Priority(10)
 class MockupHello implements Hello {
     @Override
@@ -59,17 +57,9 @@ class MockupHello implements Hello {
 
 @Configuration
 @Lazy
-@Priority(12)
+@Import(MockupHello.class)
 class MockupHelloHasOrder {
-    @Bean
-    public Hello mockuphello() {
-        return new Hello() {
-            @Override
-            public String say() {
-                return "mockup order 12";
-            }
-        };
-    }
+
 }
 
 
@@ -97,18 +87,12 @@ public class TestModuleOverride {
 
     @Test
     public void testHasOrder( ) {
-        try(var application = new AnnotationConfigApplicationContext(DefaultModule.class, MockupHello.class)) {
-            var hello = application.getBean(Hello.class);
-            Assert.assertEquals("mockup order 10", hello.say());
-        }
-    }
-
-    // not work
-    public void testConfigHasOrder( ) {
         try(var application = new AnnotationConfigApplicationContext(DefaultModule.class, MockupHelloHasOrder.class)) {
             var hello = application.getBean(Hello.class);
             Assert.assertEquals("mockup order 10", hello.say());
         }
     }
+
+
 
 }
