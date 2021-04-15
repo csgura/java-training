@@ -2,6 +2,8 @@ package com.uangel.training.impl.sharecli;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import com.typesafe.config.Config;
+import com.uangel.training.ConfigReloader;
 import com.uangel.training.actor.util.ResponseType;
 import com.uangel.training.ctclient.Client;
 import com.uangel.training.ctclient.ClientFactory;
@@ -25,13 +27,15 @@ class messageNewClient implements ResponseType<Client> {
 }
 
 @Lazy
-public class FactoryActorInterface implements ClientFactory, AutoCloseable {
+public class FactoryActorInterface implements ClientFactory, AutoCloseable , ConfigReloader {
 
     ActorRef mainActorRef;
     private ActorSystem actorSystem;
+    private Config cfg;
 
     @Autowired
-    public FactoryActorInterface(ActorSystem actorSystem) {
+    public FactoryActorInterface(ActorSystem actorSystem, Config cfg) {
+        this.cfg = cfg;
 
         System.out.println("new factory actor interface");
         mainActorRef = actorSystem.actorOf(FactoryActor.props(), "client-factory");
@@ -47,5 +51,11 @@ public class FactoryActorInterface implements ClientFactory, AutoCloseable {
     @Override
     public void close() throws Exception {
         actorSystem.stop(mainActorRef);
+    }
+
+    @Override
+    public void Reload(Config cfg) {
+        this.cfg = cfg;
+        System.out.println("config reload");
     }
 }

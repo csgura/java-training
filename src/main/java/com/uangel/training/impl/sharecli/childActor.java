@@ -43,12 +43,16 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
         this.workerGroup = workerGroup;
 
 
-        List<CompletableFuture<ClientConnection>> onGoing = new ArrayList<>();
 
         for(int i=0;i< req.numConnection;i++) {
-            onGoing.add(ClientConnection.newConnection(workerGroup,this,req.addr, req.port));
+            ClientConnection.newConnection(workerGroup,this,req.addr, req.port).whenComplete((clientConnection, throwable) -> {
+                if (throwable != null ) {
+                    self().tell(new messageConnectFailed(throwable), ActorRef.noSender());
+                }
+            });
+
         }
-        getContext().become(new initialState(onGoing).createReceive());
+        getContext().become(new initialState().createReceive());
 
         //getContext().setReceiveTimeout(Duration.ofSeconds(10));
     }
@@ -63,24 +67,10 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
     }
 
     class initialState {
-        List<CompletableFuture<ClientConnection>> onGoing;
 
-        public initialState(List<CompletableFuture<ClientConnection>> onGoing) {
-            this.onGoing = onGoing;
+        int failCount = 0;
+        public initialState() {
 
-            var inverse = onGoing.stream().map(f -> {
-                return f.handleAsync((clientConnection, throwable) -> {
-                    if(throwable!=null) {
-                        return CompletableFuture.completedFuture(true);
-                    } else {
-                        return CompletableFuture.<Boolean>failedFuture(new Exception());
-                    }
-                }).thenComposeAsync(x -> x );
-            }).collect(Collectors.toList());
-
-            CompletableFuture.allOf(inverse.toArray(new CompletableFuture[0])).thenAccept(x -> {
-                self().tell(new messageAllFailed(), ActorRef.noSender());
-            });
         }
 
         void onConnected( messageConnected r) {
@@ -100,9 +90,12 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
             getContext().stop(self());
         }
 
-        void onAllFailed( messageAllFailed r) {
-            unstashAll();
-            getContext().become(new activeState().createReceive());
+        void onConnectFailed( messageConnectFailed r) {
+            failCount++;
+            if (failCount == spec.numConnection) {
+                unstashAll();
+                getContext().become(new activeState().createReceive());
+            }
         }
 
         public Receive createReceive() {
@@ -110,7 +103,7 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
                     .match(messageSendRequest.class, this::onSendRequest)
                     .match(messageConnected.class, this::onConnected)
                     .match(messageClose.class, this::onClose)
-                    .match(messageAllFailed.class , this::onAllFailed)
+                    .match(messageConnectFailed.class , this::onConnectFailed)
                     .matchAny(r -> System.out.println("unexpected message : " + r))
                     .build();
         }
@@ -169,7 +162,9 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
         }
 
         void onReconnect(messageReconnect r) {
-            ClientConnection.newConnection(workerGroup, childActor.this, spec.addr,spec.port);
+            if (connections.size() < spec.numConnection) {
+                ClientConnection.newConnection(workerGroup, childActor.this, spec.addr, spec.port);
+            }
         }
 
         void onClose(messageClose r) {
@@ -191,6 +186,7 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
 
             if (connections.size() < spec.numConnection) {
                 for(int i=0;i< spec.numConnection - connections.size();i++) {
+                    System.out.println("create new connection");
                     self().tell(new messageReconnect(), ActorRef.noSender());
                 }
             }
@@ -249,10 +245,14 @@ class childActor extends AbstractActorWithStash implements ClientStatusListener 
     private static class messageReconnect {
     }
 
-    private static class messageAllFailed {
-    }
-
     private static class messageConnCheck {
     }
 
+    private class messageConnectFailed {
+        private Throwable throwable;
+
+        public messageConnectFailed(Throwable throwable) {
+            this.throwable = throwable;
+        }
+    }
 }

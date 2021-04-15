@@ -34,7 +34,7 @@ public class ActorModule {
     // ActorSystem 은 Close 함수가 없어서
     // destroyMethod 로 close 할 때 호출될 메소드를 지정해야 합니다.
     @Bean(destroyMethod = "terminate")
-    public ActorSystem actorSystem(  Config cfg) {
+    public ActorSystem actorSystem(  Config cfg ) {
         return ActorSystem.create("mysystem", cfg);
     }
 }
