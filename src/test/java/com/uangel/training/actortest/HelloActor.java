@@ -3,11 +3,12 @@ package com.uangel.training.actortest;
 import akka.actor.AbstractActor;
 import akka.actor.Props;
 import com.typesafe.config.Config;
+import com.uangel.actor.AbstractActorWithStashWithTimer;
 
 import java.time.OffsetDateTime;
 import java.util.NoSuchElementException;
 
-public class HelloActor extends AbstractActor {
+public class HelloActor extends AbstractActorWithStashWithTimer {
 
     private Config config;
     private actorData data;
